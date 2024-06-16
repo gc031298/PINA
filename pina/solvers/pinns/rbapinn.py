@@ -1,8 +1,8 @@
 """ Module for RBAPINN """
 
+from copy import deepcopy
 import torch
 from torch.optim.lr_scheduler import ConstantLR
-from copy import deepcopy
 from .pinn import PINN
 
 
@@ -60,7 +60,7 @@ class RBAPINN(PINN):
         Nikolaos Stergiopulos, and George E. Karniadakis.
         "Residual-based attention and connection to information 
         bottleneck theory in PINNs".
-        Computer Methods in Applied Mechanics and Engineering 421 (2024): 116805.
+        Computer Methods in Applied Mechanics and Engineering 421 (2024): 116805
         DOI: `10.1016/
         j.cma.2024.116805 <https://doi.org/10.1016/j.cma.2024.116805>`_.
     """
