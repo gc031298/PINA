@@ -64,7 +64,7 @@ class PinaTensorDataset(PinaDataset):
         if automatic_batching:
             self._getitem_func = self._getitem_int
         else:
-            self._getitem_func = self._getitem_list
+            self._getitem_func = self._getitem_dummy
 
     def _getitem_int(self, idx):
         return {
@@ -84,7 +84,7 @@ class PinaTensorDataset(PinaDataset):
         return to_return_dict
 
     @staticmethod
-    def _getitem_list(idx):
+    def _getitem_dummy(idx):
         return idx
 
     def get_all_data(self):
@@ -111,6 +111,11 @@ class PinaGraphDataset(PinaDataset):
         super().__init__(conditions_dict, max_conditions_lengths)
         self.in_labels = {}
         self.out_labels = None
+        if automatic_batching:
+            self._getitem_func = self._getitem_int
+        else:
+            self._getitem_func = self._getitem_dummy
+
         ex_data = conditions_dict[list(conditions_dict.keys())[
             0]]['input_points'][0]
         for name, attr in ex_data.items():
@@ -153,6 +158,9 @@ class PinaGraphDataset(PinaDataset):
         out = data[idx].reshape(-1, *data[idx].shape[2:])
         return out
 
+    def _getitem_dummy(self, idx):
+        return idx
+    
     def _getitem_int(self, idx):
         return {
             k: {k_data: v[k_data][idx % len(v['input_points'])] for k_data
@@ -164,8 +172,7 @@ class PinaGraphDataset(PinaDataset):
         return self.fetch_from_idx_list(index)
 
     def __getitem__(self, idx):
-        return self._getitem_int(idx) if isinstance(idx, int) else \
-            self.fetch_from_idx_list(idx=idx)
+        return self._getitem_func(idx)
 
     def _labelise_batch(self, func):
         @functools.wraps(func)
